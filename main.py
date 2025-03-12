@@ -1,68 +1,41 @@
+import sys
+from stats import (
+    get_num_words,
+    chars_dict_to_sorted_list,
+    get_chars_dict,
+)
+
+
 def main():
-    # path to book/text
-    book_path = "./books/frankenstein.txt"
+    if len(sys.argv) < 2:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
+    book_path = sys.argv[1]
 
-    # read contents of book_path
-    text = read_book(book_path)
-
-    # count number of words total
-    words = count_words(text)
-
-    # count frequency of each leter
-    letters = count_letters(text)
-
-    # generate report using two previous functions
-    report = get_report(words, letters, book_path)
-
-    print(report)
-
-def read_book(book_path):
-    with open(book_path) as f:
-        file_contents = f.read()
-
-        return file_contents
-    
-
-def count_words(text):
-    words = text.split()
-
-    return len(words)
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
+    print_report(book_path, num_words, chars_sorted_list)
 
 
-def count_letters(text):
-    non_duplicate = text.lower()
-    letters = {}
-
-    for letter in non_duplicate:
-        if letter in letters:
-            letters[letter] += 1
-        else:
-            letters[letter] = 1
-
-    return letters
+def get_book_text(path):
+    with open(path) as f:
+        return f.read()
 
 
-def get_report(words, letters, book_path):
-    chars_data = ""
-    sorted_list = []
-
-    # sort frequency list in descending order
-    for letter in letters:
-        if not letter.isalpha():
+def print_report(book_path, num_words, chars_sorted_list):
+    print("============ BOOKBOT ============")
+    print(f"Analyzing book found at {book_path}...")
+    print("----------- Word Count ----------")
+    print(f"Found {num_words} total words")
+    print("--------- Character Count -------")
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
             continue
-        sorted_list.append(letters[letter])
-    sorted_list.sort(reverse=True)
+        print(f"{item['char']}: {item['num']}")
 
-    # generate character frequncy
-    for char_count in sorted_list:
-        for key, value in letters.items():
-            if value == char_count:
-                char = key
-                char_data = f"The '{char}' character was found {char_count} times\n"
-                chars_data += char_data
+    print("============= END ===============")
 
-    # report
-    return f"--- BEGIN REPORT OF {book_path} --- \n\n{words} words found in document \n\n{chars_data}\n--- END REPORT ---"
 
-if __name__ == "__main__":
-    main()
+main()
